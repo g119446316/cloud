@@ -14,7 +14,7 @@ from base64 import b64decode
 from Crypto.Cipher import AES
 from Crypto.Util.Padding import unpad
 
-app = Flask(__name__,static_url_path="/templates", static_folder='/home/nvidia/tmp/templates')
+app = Flask(__name__,static_url_path="/templates", static_folder='/home/cloud/tmp/templates')
 redis = Redis(host='0.0.0.0',port=6379)
 
 app.config['SECRET_KEY'] = 'secret!'
