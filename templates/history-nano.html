@@ -1,0 +1,532 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+	<meta charset="utf-8">
+	<meta http-equiv="X-UA-Compatible" content="IE=edge">
+	<meta name="viewport" content="width=device-width, initial-scale=1">
+
+	<title>Jetson nano - Real Time</title>
+
+	<!-- stylesheets -->
+	<link href="/templates/assets/fonts/font-roboto.css" rel="stylesheet">
+	<link href="/templates/assets/bootstrap/bootstrap4-alpha3.min.css" rel="stylesheet">
+	<link href="/templates/assets/font-awesome/css/font-awesome.min.css" rel="stylesheet">
+	<link href="/templates/assets/web-analytics/style.css" rel="stylesheet">
+	<link rel="stylesheet" href="https://code.jquery.com/ui/1.10.4/themes/smoothness/jquery-ui.css">
+ 	
+  
+
+  
+
+
+	<!-- scripts -->
+	
+	<script src="/templates/assets/jquery/jquery-3.1.0.min.js"></script>
+	<script src="http://ajax.googleapis.com/ajax/libs/jqueryui/1.10.2/jquery-ui.min.js"></script>
+	<script src="/templates/assets/tether/tether.min.js"></script>
+        <script src="https://cdnjs.cloudflare.com/ajax/libs/socket.io/1.3.6/socket.io.min.js"></script>
+	<script src="/templates/assets/bootstrap/bootstrap4-alpha3.min.js"></script>
+	<!--<script src="https://canvasjs.com/assets/script/canvasjs.min.js"></script>  3.1.0-->
+        <script src="/templates/assets/canvasjs.min.js"></script>
+	<!-- <script src="/templates/assets/web-analytics/jetson-psutil.js"></script>-->
+        <script>
+	window.onload = function () {
+		$("#datepicker").datepicker({dateFormat: "yy-dd-mm"});
+	 	$.get('/deviceip', function(data) {
+	     
+		var select = document.getElementById("deviceip_select");
+		var optval = $("#deviceip_select>option").map(function() { return $(this).val(); }).get();			
+		if (optval.length <  data.device_ip.length){
+			$("#deviceip_select").empty();
+			var opt = document.createElement('option');
+			opt.innerHTML = "IP Address";
+			select.appendChild(opt);
+		       	for (i=0;i < data.device_ip.length;i++){
+				opt = document.createElement('option');
+				opt.value = data.device_ip[i];
+				opt.innerHTML = data.device_ip[i];
+				select.appendChild(opt);
+				}
+			}
+			});
+	};
+		function get_datetime(){
+			var ip_adr = document.getElementById("deviceip_select").value;		
+			var datetime = document.getElementById("datepicker").value;
+			$.post( "/history-data", { "ip":ip_adr,"time":datetime} ,function(hsdata){
+			console.log(hsdata.data);
+			var data  = hsdata.data;
+			dashboard(data);
+			});
+		}		
+		/*function get_value(){
+			var ip_adr = document.getElementById("deviceip_select").value;		
+			var datetime = document.getElementById("datepicker").value;
+			$.post( "/history-data", { "ip":ip_adr,"time":datetime} ,function(hsdata){
+			console.log(hsdata.data);
+			var data  = hsdata.data;
+			dashboard(data);
+			});
+		}*/
+
+		function dashboard(data){
+		//Temp Thermal start 		
+		var thermal_list = [];
+		for(i=0;i<data.length;i++){
+			var dps = {y:data[i].thermal_fan_est};			
+			thermal_list.push(dps);
+		}
+		var thermalchart = new CanvasJS.Chart("temp-thermal-chart", {
+		animationEnabled: true,  
+		axisY: {
+			title: "Thermal",			
+			suffix: "℃  ",
+			
+		},
+		data: [{
+			type: "splineArea",
+			color: "rgba(54,158,173,.7)",
+			markerSize: 5,			
+			dataPoints:thermal_list
+			
+			}]
+			});
+		thermalchart.render();
+	
+
+		//PLL Temp start 		
+		var pll_list = [];
+		for(i=0;i<data.length;i++){
+			var dps = {y:data[i].PLL_therm};			
+			pll_list.push(dps);
+		}
+		var pllchart = new CanvasJS.Chart("temp-pll-chart", {
+		animationEnabled: true,  
+		axisY: {
+			title: "Thermal",			
+			suffix: "℃  ",
+			
+		},
+		data: [{
+			type: "splineArea",
+			color: "rgba(54,158,173,.7)",
+			markerSize: 5,			
+			dataPoints:pll_list
+			
+			}]
+			});
+		pllchart.render();
+	
+
+
+
+		//CPU Temp start 		
+		var cpu_list = [];
+		for(i=0;i<data.length;i++){
+			var dps = {y:data[i].CPU_therm};			
+			cpu_list.push(dps);
+		}
+		var cpuchart = new CanvasJS.Chart("temp-cpu-chart", {
+		animationEnabled: true,  
+		axisY: {
+			title: "Thermal",			
+			suffix: "℃  ",
+			
+		},
+		data: [{
+			type: "splineArea",
+			color: "rgba(54,158,173,.7)",
+			markerSize: 5,			
+			dataPoints:cpu_list
+			
+			}]
+			});
+		cpuchart.render();
+	
+
+
+		//GPU Temp start 		
+		var gpu_list = [];
+		for(i=0;i<data.length;i++){
+			var dps = {y:data[i].GPU_therm};			
+			gpu_list.push(dps);
+		}
+		var gpuchart = new CanvasJS.Chart("temp-gpu-chart", {
+		animationEnabled: true,  
+		axisY: {
+			title: "Thermal",			
+			suffix: "℃  ",
+			
+		},
+		data: [{
+			type: "splineArea",
+			color: "rgba(54,158,173,.7)",
+			markerSize: 5,			
+			dataPoints:gpu_list
+			
+			}]
+			});
+		gpuchart.render();
+		
+		//AO Temp start 		
+		var ao_list = [];
+		for(i=0;i<data.length;i++){
+			var dps = {y:data[i].AO_therm};			
+			ao_list.push(dps);
+		}
+		var aochart = new CanvasJS.Chart("temp-ao-chart", {
+		animationEnabled: true,  
+		axisY: {
+			title: "Thermal",			
+			suffix: "℃  ",
+			
+		},
+		data: [{
+			type: "splineArea",
+			color: "rgba(54,158,173,.7)",
+			markerSize: 5,			
+			dataPoints:ao_list
+			
+			}]
+			});
+		aochart.render();
+
+		//loadavg start 		
+		var loadavg_list = [];
+		for(i=0;i<data.length;i++){
+			var dps = {y:data[i].loadavg};			
+			loadavg_list.push(dps);
+		}
+		var loadavgchart = new CanvasJS.Chart("loadavg-chart", {
+		animationEnabled: true,  
+		axisY: {					
+			suffix: "%"
+			
+		},
+		data: [{
+			type: "splineArea",
+			color: "rgba(54,158,173,.7)",
+			markerSize: 5,			
+			dataPoints:loadavg_list
+			
+			}]
+			});
+		loadavgchart.render();
+
+		//mem start 		
+		var mem_list = [];
+		for(i=0;i<data.length;i++){
+			var dps = {y:data[i].mem};			
+			mem_list.push(dps);
+		}
+		var memchart = new CanvasJS.Chart("mem-chart", {
+		animationEnabled: true,  
+		axisY: {			
+			suffix: "%",
+			
+			
+		},
+		data: [{
+			type: "splineArea",
+			color: "rgba(54,158,173,.7)",
+			markerSize: 5,			
+			dataPoints:mem_list
+			
+			}]
+			});
+		memchart.render();
+
+
+
+	//CPU & GPU Percent
+		var c1_list = [];
+		var c2_list = [];
+		var c3_list = [];
+		var c4_list = [];
+		var g_list = [];
+		for(i=0;i<data.length;i++){
+			var c1_dps = {y:data[i].CPU1};
+			var c2_dps = {y:data[i].CPU2};
+			var c3_dps = {y:data[i].CPU3};
+			var c4_dps = {y:data[i].CPU4};
+			var g_dps = {y:data[i].GPU};	
+			c1_list.push(c1_dps);
+			c2_list.push(c2_dps);
+			c3_list.push(c3_dps);
+			c4_list.push(c4_dps);
+			g_list.push(g_dps);			
+		}
+	var chart = new CanvasJS.Chart("users-state-bar-chart", {
+ 	height:450,
+	animationEnabled: true,
+	title:{
+		text: "CPU & GPU Percent"             
+	}, 
+	axisY:{
+		suffix: "%",
+		maximum:100,
+	},
+	toolTip: {
+		shared: true
+	},
+	legend:{
+		cursor:"pointer",
+		itemclick: toggleDataSeries
+	},
+	data: [{        
+		type: "spline",  
+		name: "GPU",        
+		showInLegend: true,
+		dataPoints:g_list
+	}, 
+	{        
+		type: "spline",
+		name: "CPU1",        
+		showInLegend: true,
+		dataPoints: c1_list
+	},
+	{        
+		type: "spline",  
+		name: "CPU2",        
+		showInLegend: true,
+		dataPoints: c2_list
+	},
+	{        
+		type: "spline",  
+		name: "CPU3",        
+		showInLegend: true,
+		dataPoints: c3_list
+	},
+	{        
+		type: "spline",  
+		name: "CPU4",        
+		showInLegend: true,
+		dataPoints: c4_list
+	},  
+	]
+	});
+
+	chart.render();
+
+	function toggleDataSeries(e) {
+		if(typeof(e.dataSeries.visible) === "undefined" || e.dataSeries.visible) {
+			e.dataSeries.visible = false;
+		}
+		else {
+			e.dataSeries.visible = true;            
+		}
+		chart.render();
+	}
+
+		
+		
+
+		}
+        </script>
+</head>
+
+<body>
+	<!-- header -->
+	<nav class="navbar navbar-fixed-top" id="header">
+		<div class="container-fluid">
+			<div class="navbar-header">
+				<div id="sidebar-toggle-button">
+					<i class="fa fa-bars" aria-hidden="true"></i>
+				</div>
+				<div class="brand">
+					<a href="#">
+						<span class="hidden-xs-down m-r-3">NVIDIA Jetson nano </span><span class="lead" id="titlerealtime">Real Time</span>
+					</a>
+				</div>
+				<!--<div class="brand">
+					<a href="#">
+					<span class="lead" id="titledeviceip">Device IP : </span>
+					</a>
+				</div>-->
+
+			</div>
+		</div>
+	</nav>
+	<!-- /header -->
+
+	<!-- sidebar -->
+
+	<div class="sidebar-toggle" id="sidebar">
+		<ul class="nav nav-sidebar">
+			<li>
+				<a href="/psutil-nano" class="active">
+					<i class="fa fa-area-chart fa-lg fa-fw" aria-hidden="true"></i>
+					<span>Real time</span>
+				</a>
+			</li>
+
+			<li role="separator" class="divider"></li>
+			<li>
+				<a href="/ws-control">
+					<i class="fa fa-cogs fa-lg fa-fw" aria-hidden="true"></i>
+					<span>Remote Control</span>
+
+				</a>
+
+			</li>
+
+			<li role="separator" class="divider"></li>
+			<li>
+				<a href="/history-nano">
+					<i class="fa fa-bar-chart fa-lg fa-fw" aria-hidden="true"></i>
+					<span>History info</span>
+
+				</a>
+
+			</li>
+			<li role="separator" class="divider"></li>
+			<li>
+				<a href="/logout">
+					<i class="fa fa-sign-out fa-lg fa-fw" aria-hidden="true"></i>
+					<span>Log out</span>
+
+				</a>
+
+			</li>
+			<li role="separator" class="divider"></li>
+
+		</ul>
+
+	</div>
+
+	<!-- /sidebar -->
+
+
+	
+
+	<!-- page-content-wrapper -->
+	<div class="page-content-toggle" id="page-content-wrapper">
+		<div class="container-fluid">
+			<div class="row m-b-2">
+				<div class="col-lg-6" "><br>
+					<div >
+						<span style="font-size:30px">Choose device</span> &nbsp&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp
+						<select class="deviceip-select" id="deviceip_select" onchange="get_value();">
+							
+						
+						</select>
+						<span>日期：<input type="text" id="datepicker" onchange="get_datetime();"></span>
+
+					</div>
+				</div>
+			</div>
+
+			<!-- 1st row -->
+			<div class="row m-b-2">
+				<!-- <div class="col-lg-4">
+					<div class="card card-block">
+						<h4 class="card-title">FAN Speed</h4>
+						<div id="fanchart"></div>
+					</div>
+				</div>-->
+				<div class="col-lg-6">
+					<div class="card card-block">
+						<h4 class="card-title">Temp Thermal</h4>
+						<div id="temp-thermal-chart"></div>
+					</div>
+				</div>
+				<div class="col-lg-6">
+					<div class="card card-block">
+						<h4 class="card-title">PLL Temp</h4>
+						<div id="temp-pll-chart"></div>
+					</div>
+				</div>
+			</div>
+			<!-- /1st row -->
+			<div class="row m-b-2"><br><br><br><br><br><br><br><br><br><br><br><br><br><br><br><br></div>
+                        <!-- 2rd row -->
+
+                        <div class="row m-b-2">
+                                <div class="col-lg-6">
+                                        <div class="card card-block">
+                                                <h4 class="card-title">CPU Temp</h4>
+                                                <div id="temp-cpu-chart"></div>
+                                        </div>
+                                </div>
+                                <div class="col-lg-6">
+                                        <div class="card card-block">
+                                                <h4 class="card-title">GPU Temp</h4>
+                                                <div id="temp-gpu-chart"></div>
+                                        </div>
+                                </div>
+                                
+                        </div> 
+			
+
+                        <!-- 2 row -->		
+			<div class="row m-b-2"><br><br><br><br><br><br><br><br><br><br><br><br><br><br><br><br></div>
+
+			<!-- 3rd row -->
+			<div class="row">
+				<div class="col-md-6">
+					<div class="card card-block">
+						<h4 class="card-title">CPU & GPU Percent</h4>
+						<div id="users-state-bar-chart"></div>
+					</div>
+				</div>
+				<div class="col-lg-6">
+                                        <div class="card card-block">
+                                                <h4 class="card-title">AO Temp</h4>
+                                                <div id="temp-ao-chart"></div>
+                                        </div>
+                                </div>
+			</div>
+
+			<!-- /3rd row -->
+			<div class="row m-b-2"><br><br><br><br><br></div>
+                        <!-- 4 row -->
+                        <div class="row">
+                                <div class="col-md-6">
+                                        <div class="card card-block">
+                                                <h4 class="card-title">System Load (5 minutes) </h4>
+                                                <div id="loadavg-chart"></div>
+                                        </div>
+                                </div>
+                                <div class="col-md-6">
+                                        <div class="card card-block">
+                                                <h4 class="card-title">Memory Percent</h4>
+                                                <div id="mem-chart"></div>
+                                        </div>
+                                </div>
+
+                        </div>
+
+                        <!-- 4 row -->
+                        <div class="row m-b-2"><br><br><br><br><br><br><br><br><br><br><br><br><br><br><br><br></div>
+
+                        <!-- 5 row -->
+                        <div class="row">
+                                <div class="col-md-12">
+                                        <div class="card card-block">
+                                                <h4 class="card-title">HW engines</h4>
+                                                <div id="nvenc">nvenc : [OFF]</div>
+                                                <div id="nvdec">nvdec : [OFF]</div>
+                                                <div id="nvjpg">nvjpg : [OFF]</div>
+                                                <div id="nvp-model">nvp-model : [OFF]</div>
+                                                <div id="ape">APE : [25]</div>
+
+                                        </div>
+                                </div>
+                                
+                        </div>
+
+                        <!-- 5 row -->
+
+
+
+
+		</div>
+		<!-- /.container-fluid -->
+
+	</div>
+	<!-- /page-content-wrapper -->
+
+</body>
+
+</html>
