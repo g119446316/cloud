@@ -1,0 +1,482 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+	<meta charset="utf-8">
+	<meta http-equiv="X-UA-Compatible" content="IE=edge">
+	<meta name="viewport" content="width=device-width, initial-scale=1">
+
+	<title>Jetson nano - Fan </title>
+
+	<!-- stylesheets -->
+	<link href="/templates/assets/fonts/font-roboto.css" rel="stylesheet">
+	<link href="/templates/assets/bootstrap/bootstrap4-alpha3.min.css" rel="stylesheet">
+	<link href="/templates/assets/font-awesome/css/font-awesome.min.css" rel="stylesheet">
+	<link href="/templates/assets/web-analytics/style.css" rel="stylesheet">
+
+	<!-- scripts -->
+	<script src="/templates/assets/jquery/jquery-3.1.0.min.js"></script>
+	<script src="/templates/assets/tether/tether.min.js"></script>
+        <script src="https://cdnjs.cloudflare.com/ajax/libs/socket.io/1.3.6/socket.io.min.js"></script>
+	<script src="/templates/assets/bootstrap/bootstrap4-alpha3.min.js"></script>
+	<!--<script src="https://canvasjs.com/assets/script/canvasjs.min.js"></script>-->
+        <script src="/templates/assets/canvasjs.min.js"></script>
+	<!--<script src="/templates/assets/web-analytics/jetson-psutil.js"></script>-->
+        <script type = "text/javascript" >
+	
+	window.onload = function () {
+		//document.body.style.backgroundColor = "gray";
+                
+		$.get('/deviceip', function(data) {
+   		        
+			var select = document.getElementById("deviceip_select");
+			var optval = $("#deviceip_select>option").map(function() { return $(this).val(); }).get();			
+			if (optval.length <  data.device_ip.length){
+				$("#deviceip_select").empty();
+				var opt = document.createElement('option');
+				opt.innerHTML = "IP Address";
+				select.appendChild(opt);
+			       		for (i=0;i < data.device_ip.length;i++){
+						opt = document.createElement('option');
+						opt.value = data.device_ip[i];
+						opt.innerHTML = data.device_ip[i];
+						select.appendChild(opt);
+					}
+				}
+
+			});
+
+		};
+		function get_value() {
+		
+		//var socket = io.connect();
+		//socket.removeAllListeners();
+		var ip_adr = document.getElementById("deviceip_select").value;
+		var fan_bt = document.getElementById("fan_bt");
+		var reset_bt = document.getElementById("reset_bt");
+		var bytes= 1; 
+  		var aBuffer = new ArrayBuffer(bytes);
+		function sleep (time) {return new Promise((resolve) => setTimeout(resolve, time));}
+		sleep(1500).then(() => {
+		var overall = new CanvasJS.Chart("overall", {
+		        animationDuration: 900,
+		        animationEnabled: true,
+		        backgroundColor: "transparent",
+		        title: {
+		                dockInsidePlotArea: true,
+		                fontSize: 60,
+		                fontWeight: "normal",
+		                horizontalAlign: "center",
+		                verticalAlign: "center",
+		                text :89
+		        },
+		        toolTip: {
+		                cornerRadius: 0,
+		                fontStyle: "normal"
+		        },
+		        data: [
+		                {		                
+		                innerRadius: "80%",
+		                radius: "80%",		               
+		                startAngle: 270,
+		                type: "doughnut",
+		                dataPoints: [{y:89,color:"#66B3FF"},{y:11,color:"#F0F0F0"}]
+		                }
+		        ]
+        	});
+       		overall.render();
+
+		var fanchart = new CanvasJS.Chart("fanchart", {
+		        animationDuration: 900,
+		        animationEnabled: true,
+		        backgroundColor: "transparent",
+		        title: {
+		                dockInsidePlotArea: true,
+		                fontSize: 40,
+		                fontWeight: "normal",
+		                horizontalAlign: "center",
+		                verticalAlign: "center",
+		                text :96
+		        },
+		        toolTip: {
+		                cornerRadius: 0,
+		                fontStyle: "normal"
+		        },
+		        data: [
+		                {
+		               innerRadius: "80%",
+		                radius: "80%",		               
+		                startAngle: 270,
+		                type: "doughnut",
+		                dataPoints: [{y:96,color:"#53FF53"},{y:4,color:"#F0F0F0"}]
+		                }
+		        ]
+        	});
+       		fanchart.render();
+
+		var diskchart = new CanvasJS.Chart("diskchart", {
+		        animationDuration: 900,
+		        animationEnabled: true,
+		        backgroundColor: "transparent",
+		        title: {
+		                dockInsidePlotArea: true,
+		                fontSize: 40,
+		                fontWeight: "normal",
+		                horizontalAlign: "center",
+		                verticalAlign: "center",
+		                text :87
+		        },
+		        toolTip: {
+		                cornerRadius: 0,
+		                fontStyle: "normal"
+		        },
+		        data: [
+		                {
+		               innerRadius: "80%",
+		                radius: "80%",		               
+		                startAngle: 270,
+		                type: "doughnut",
+		                dataPoints: [{y:87,color:"#FF8000"},{y:13,color:"#F0F0F0"}]
+		                }
+		        ]
+        	});
+       		diskchart.render();
+
+		var cpuchart = new CanvasJS.Chart("cpuchart", {
+		        animationDuration: 900,
+		        animationEnabled: true,
+		        backgroundColor: "transparent",
+		        title: {
+		                dockInsidePlotArea: true,
+		                fontSize: 40,
+		                fontWeight: "normal",
+		                horizontalAlign: "center",
+		                verticalAlign: "center",
+		                text :85
+		        },
+		        toolTip: {
+		                cornerRadius: 0,
+		                fontStyle: "normal"
+		        },
+		        data: [
+		                {
+		               innerRadius: "80%",
+		                radius: "80%",		               
+		                startAngle: 270,
+		                type: "doughnut",
+		                dataPoints: [{y:85,color:"#D94600"},{y:15,color:"#F0F0F0"}]
+		                }
+		        ]
+        	});
+       		cpuchart.render();
+		
+		var gpuchart = new CanvasJS.Chart("gpuchart", {
+		        animationDuration: 900,
+		        animationEnabled: true,
+		        backgroundColor: "transparent",
+		        title: {
+		                dockInsidePlotArea: true,
+		                fontSize: 40,
+		                fontWeight: "normal",
+		                horizontalAlign: "center",
+		                verticalAlign: "center",
+		                text :90
+		        },
+		        toolTip: {
+		                cornerRadius: 0,
+		                fontStyle: "normal"
+		        },
+		        data: [
+		                {
+		               innerRadius: "80%",
+		                radius: "80%",		               
+		                startAngle: 270,
+		                type: "doughnut",
+		                dataPoints: [{y:90,color:"#B766AD"},{y:10,color:"#F0F0F0"}]
+		                }
+		        ]
+        	});
+       		gpuchart.render();
+
+		var memchart = new CanvasJS.Chart("memchart", {
+		        animationDuration: 900,
+		        animationEnabled: true,
+		        backgroundColor: "transparent",
+		        title: {
+		                dockInsidePlotArea: true,
+		                fontSize: 40,
+		                fontWeight: "normal",
+		                horizontalAlign: "center",
+		                verticalAlign: "center",
+		                text :65
+		        },
+		        toolTip: {
+		                cornerRadius: 0,
+		                fontStyle: "normal"
+		        },
+		        data: [
+		                {
+		               innerRadius: "80%",
+		                radius: "80%",		               
+		                startAngle: 270,
+		                type: "doughnut",
+		                dataPoints: [{y:65,color:"#FF44FF"},{y:35,color:"#F0F0F0"}]
+		                }
+		        ]
+        	});
+       		memchart.render();
+
+		var networkchart = new CanvasJS.Chart("networkchart", {
+		        animationDuration: 900,
+		        animationEnabled: true,
+		        backgroundColor: "transparent",
+		        title: {
+		                dockInsidePlotArea: true,
+		                fontSize: 40,
+		                fontWeight: "normal",
+		                horizontalAlign: "center",
+		                verticalAlign: "center",
+		                text :79
+		        },
+		        toolTip: {
+		                cornerRadius: 0,
+		                fontStyle: "normal"
+		        },
+		        data: [
+		                {
+		               innerRadius: "80%",
+		                radius: "80%",		               
+		                startAngle: 270,
+		                type: "doughnut",
+		                dataPoints: [{y:79,color:"#FFFF6F"},{y:21,color:"#F0F0F0"}]
+		                }
+		        ]
+        	});
+       		networkchart.render();
+
+
+
+
+		
+		
+})
+
+	}
+	</script>
+        
+<style>
+input[type="button"] {
+ background: #2a0a45;
+  background-image: -webkit-linear-gradient(top, #2a0a45, #b82bb8);
+  background-image: -moz-linear-gradient(top, #2a0a45, #b82bb8);
+  background-image: -ms-linear-gradient(top, #2a0a45, #b82bb8);
+  background-image: -o-linear-gradient(top, #2a0a45, #b82bb8);
+  background-image: linear-gradient(to bottom, #2a0a45, #b82bb8);
+  -webkit-border-radius: 28;
+  -moz-border-radius: 28;
+  border-radius: 28px;
+  font-family: Courier New;
+  color: #ffffff;
+  font-size: 20px;
+  padding: 3px 15px 3px 20px;
+  text-decoration: none;
+}
+
+input[type="button"]:hover {
+   background: #3cfca6;
+  background-image: -webkit-linear-gradient(top, #3cfca6, #3498db);
+  background-image: -moz-linear-gradient(top, #3cfca6, #3498db);
+  background-image: -ms-linear-gradient(top, #3cfca6, #3498db);
+  background-image: -o-linear-gradient(top, #3cfca6, #3498db);
+  background-image: linear-gradient(to bottom, #3cfca6, #3498db);
+  text-decoration: none;
+}
+</style>
+
+
+</head>
+
+<body>
+	<!-- header -->
+	<nav class="navbar navbar-fixed-top" id="header">
+		<div class="container-fluid">
+			<div class="navbar-header">
+				<div id="sidebar-toggle-button">
+					<i class="fa fa-bars" aria-hidden="true"></i>
+				</div>
+				<div class="brand">
+					<a href="web-analytics-real-time.html">
+						<span class="hidden-xs-down m-r-3">NVIDIA Jetson nano - Remote Control </span>
+					</a>
+				</div>
+
+			</div>
+		</div>
+	</nav>
+	<!-- /header -->
+
+	<!-- sidebar -->
+	<div class="sidebar-toggle" id="sidebar">
+		<ul class="nav nav-sidebar">
+			<li>
+				<a href="/psutil-nano" class="active">
+					<i class="fa fa-area-chart fa-lg fa-fw" aria-hidden="true"></i>
+					<span>Real time</span>
+				</a>
+			</li>
+
+			<li role="separator" class="divider"></li>
+			<li>
+				<a href="/ws-control">
+					<i class="fa fa-cogs fa-lg fa-fw" aria-hidden="true"></i>
+					<span>Remote Control</span>
+
+				</a>
+
+			</li>
+
+			<li role="separator" class="divider"></li>
+			<li>
+				<a href="/history-nano">
+					<i class="fa fa-bar-chart fa-lg fa-fw" aria-hidden="true"></i>
+					<span>History info</span>
+
+				</a>
+
+			</li>
+			<li role="separator" class="divider"></li>
+			<li>
+				<a href="/system-health">
+					<i class="fa fa-tasks fa-lg fa-fw" aria-hidden="true"></i>
+					<span>System Health</span>
+
+				</a>
+
+			</li>
+			<li role="separator" class="divider"></li>
+			<li>
+				<a href="/logout">
+					<i class="fa fa-sign-out fa-lg fa-fw" aria-hidden="true"></i>
+					<span>Log out</span>
+
+				</a>
+
+			</li>
+			<li role="separator" class="divider"></li>
+
+		</ul>
+
+	</div>
+
+	<!-- /sidebar -->
+
+
+	
+
+	<!-- page-content-wrapper -->
+	<div class="page-content-toggle" id="page-content-wrapper">
+		<div class="container-fluid">
+			<div class="row m-b-2">
+				<div class="col-lg-6" "><br>
+					<div >
+						<span style="font-size:30px">Choose device</span> &nbsp&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp
+						<select class="deviceip-select" id="deviceip_select" onchange="get_value();">
+							
+							<option>0.0.0.0</option>							
+						</select>
+						
+
+					</div>
+				</div>
+			</div>
+			<!-- 1st row -->
+			<div class="row m-b-2">
+				
+
+				<div class="col-lg-12">
+					<div class="card card-block">
+						<h4 class="card-title">Preventive maintenance</h4>
+					</div>
+					<div class="col-lg-3" style="top:10px;">					
+						<input type="image" src="/templates/assets/images/jetson-nano.png" width="357" height="300"> 			
+					</div>
+					<div class="col-lg-3" >
+						<div class="card card-block">
+							<h4 class="card-title">Overall Score</h4>
+							<div id="overall"></div>
+						</div>
+					</div>
+					<div class="col-lg-2" >
+						<div class="card card-block">
+							<h4 class="card-title">Fan</h4>
+							<div id="fanchart"></div>
+						</div>
+					</div>
+					<div class="col-lg-2" >
+						<div class="card card-block">
+							<h4 class="card-title">Disk</h4>
+							<div id="diskchart"></div>
+						</div>
+					</div>
+					<div class="col-lg-2" >
+						<div class="card card-block">
+							<h4 class="card-title">Cpu</h4>
+							<div id="cpuchart"></div>
+						</div>
+					</div>
+					
+				</div>
+				
+			</div>
+			<!-- /1st row -->
+			<!-- 2rd row -->
+			<div class="row m-b-2">
+				
+
+				<div class="col-lg-12">
+					
+					<div class="col-lg-3" style="top:10px;">					
+							
+					</div>
+					<div class="col-lg-3" >
+						
+					</div>
+					<div class="col-lg-2" >
+						<div class="card card-block">
+							<h4 class="card-title">Gpu</h4>
+							<div id="gpuchart"></div>
+						</div>
+					</div>
+					<div class="col-lg-2" >
+						<div class="card card-block">
+							<h4 class="card-title">Mem</h4>
+							<div id="memchart"></div>
+						</div>
+					</div>
+					<div class="col-lg-2" >
+						<div class="card card-block">
+							<h4 class="card-title">Network</h4>
+							<div id="networkchart"></div>
+						</div>
+					</div>
+					
+				</div>
+				
+			</div>
+			<!-- /2rd row -->
+ 
+
+
+
+
+
+
+		</div>
+		<!-- /.container-fluid -->
+
+	</div>
+	<!-- /page-content-wrapper -->
+
+</body>
+
+</html>

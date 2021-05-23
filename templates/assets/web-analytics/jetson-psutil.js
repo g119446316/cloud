@@ -6,7 +6,7 @@ $(function () {
 
   //get device ip
   $.get('/deviceip', function(data) {
-       console.log("why");
+     
 	var select = document.getElementById("deviceip_select");
 	var optval = $("#deviceip_select>option").map(function() { return $(this).val(); }).get();			
 	if (optval.length <  data.device_ip.length){
@@ -52,12 +52,12 @@ var loadavg = new CanvasJS.Chart("loadavg-chart",{
 
 
 function get_value() {
-var socket = io.connect();
+
 socket.removeAllListeners();
 
 var ip_adr = document.getElementById("deviceip_select").value;
 
-console.log(ip_adr);
+
 
 var loadavg = new CanvasJS.Chart("loadavg-chart",{      
        axisX:{       
@@ -81,7 +81,7 @@ loadavg.render();
 
 socket.on(ip_adr, function(msg) {
 
-	console.log(ip_adr);
+	
 	//document.body.style.backgroundColor = "white";
 
 	var date = new Date();
@@ -383,6 +383,40 @@ var memchart = new CanvasJS.Chart("mem-chart",
                 ]
         });
         memchart.render();
+
+
+//disk
+var diskchart = new CanvasJS.Chart("disk-chart",
+        {
+                theme: "light2",
+                colorSet: "customColorSet",
+                data: [
+                {       
+                        type: "pie",
+			startAngle:90,
+                        showInLegend: true,
+                        toolTipContent: "{y} - #percent %",
+                        dataPoints: [
+                                {  y: msg.disk, indexLabel: "Used  #percent %",legendText:"Used", indexLabelFontSize: 20  },
+                                {  y: 100-msg.disk, indexLabel: "Free  #percent %",legendText:"Free" , indexLabelFontSize: 20  },
+
+                        ]
+                }
+                ]
+        });
+        diskchart.render();
+
+//network
+if (msg.N == "FC"){
+   document.getElementById("network").innerHTML="Cable is not connected ";
+}
+if (msg.N == "T"){
+   document.getElementById("network").innerHTML="Network connected";
+}
+if (msg.N == "F"){
+   document.getElementById("network").innerHTML="Network not connected";
+}
+
 
 
 /*document.getElementById("nvenc").innerHTML="NVENC : ["+msg.NVENC+"]";

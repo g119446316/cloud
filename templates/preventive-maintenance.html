@@ -144,7 +144,6 @@ input[type="button"]:hover {
 	<!-- /header -->
 
 	<!-- sidebar -->
-
 	<div class="sidebar-toggle" id="sidebar">
 		<ul class="nav nav-sidebar">
 			<li>
@@ -173,12 +172,21 @@ input[type="button"]:hover {
 				</a>
 
 			</li>
+			<li role="separator" class="divider"></li>
 			
+			<li>
+				<a href="/preventive-maintenance">
+					<i class="fa fa-tasks fa-lg fa-fw" aria-hidden="true"></i>
+					<span>Preventive maintenance</span>
+
+				</a>
+
+			</li>
 			<li role="separator" class="divider"></li>
 			<li>
-				<a href="/system-health">
-					<i class="fa fa-tasks fa-lg fa-fw" aria-hidden="true"></i>
-					<span>System Health</span>
+				<a href="/log">
+					<i class="fa fa-file fa-lg fa-fw" aria-hidden="true"></i>
+					<span>Log analyis</span>
 
 				</a>
 
@@ -221,27 +229,17 @@ input[type="button"]:hover {
 			</div>
 			<!-- 1st row -->
 			<div class="row m-b-2">
-				<div class="col-lg-12" style="height:300px;">
-					<div class="card card-block">
-						<h4 class="card-title">FAN Speed</h4>
-						<div id="fanchart"></div>
-					</div>				
-					<div class="col-lg-12" style="top:20px;">
-						<input type="text" id ="fan_speed" name="content" placeholder="輸入轉速(0 ~ 255)" value=""/><br><br>
-        					<input type="button" id="fan_bt"  value="Adjust" />
-					</div>
-
-				</div>
+				
 
 				<div class="col-lg-12">
 					<div class="card card-block">
-						<h4 class="card-title">Reset system</h4>
+						<h4 class="card-title">Preventive maintenance</h4>
 					</div>
 						<div class="col-lg-12" style="top:10px;">
 							<div  >
-							<input type="button" id="reset_bt"  value="Reset Nano!" />
+							<input type="image" src="/templates/assets/images/jetson-nano.png" width="512" height="430"> 
 							</div>
-						</div>
+					</div>
 					
 				</div>
 				

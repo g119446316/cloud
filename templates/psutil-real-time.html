@@ -81,6 +81,16 @@
 
 			</li>
 			<li role="separator" class="divider"></li>
+			
+			<li>
+				<a href="/system-health">
+					<i class="fa fa-tasks fa-lg fa-fw" aria-hidden="true"></i>
+					<span>System Health</span>
+
+				</a>
+
+			</li>
+			<li role="separator" class="divider"></li>
 			<li>
 				<a href="/logout">
 					<i class="fa fa-sign-out fa-lg fa-fw" aria-hidden="true"></i>
@@ -109,7 +119,7 @@
 						<span style="font-size:30px">Choose device</span> &nbsp&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp
 						<select class="deviceip-select" id="deviceip_select" onchange="get_value();">
 							
-													
+														
 						</select>
 						
 
@@ -201,6 +211,25 @@
 
                         <!-- 5 row -->
                         <div class="row">
+                                <div class="col-md-6">
+                                        <div class="card card-block">
+                                                <h4 class="card-title">Network</h4>
+                                                <div id="network-chart" style="position: relative;text-align: center;top:150px;"><span id ="network"style="font-size:40px;">123</span></div>
+                                        </div>
+                                </div>
+                                <div class="col-md-6">
+                                        <div class="card card-block">
+                                                <h4 class="card-title">Disk Percent</h4>
+                                                <div id="disk-chart"></div>
+                                        </div>
+                                </div>
+
+                        </div>
+
+                        <!-- 5 row -->
+			<div class="row m-b-2"><br><br><br><br><br><br><br><br><br><br><br><br><br></div>
+                        <!-- 6 row -->
+                        <div class="row">
                                 <div class="col-md-12">
                                         <div class="card card-block">
                                                 <h4 class="card-title">HW engines</h4>
@@ -215,7 +244,7 @@
                                 
                         </div>
 
-                        <!-- 5 row -->
+                        <!-- 6 row -->
 
 
 

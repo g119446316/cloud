@@ -13,9 +13,11 @@ from random import randint
 from base64 import b64decode
 from Crypto.Cipher import AES
 from Crypto.Util.Padding import unpad
+import hashlib
 
-app = Flask(__name__,static_url_path="/templates", static_folder='/home/cloud/templates')
-redis = Redis(host='redis',port=6379)
+
+app = Flask(__name__,static_url_path="/templates", static_folder='/home/g/tmp/templates')
+redis = Redis(host='0.0.0.0',port=6379)
 
 app.config['SECRET_KEY'] = 'secret!'
 #app.secret_key = config.get('flask', 'secret_key')
@@ -73,18 +75,40 @@ def upload():
     if ip_addr.encode('utf-8') not in redis.lrange("device_ip", 0, redis.llen("device_ip")):
        redis.rpush("device_ip",ip_addr)
 
-    #get psutil or jtop info and aes decode
+    #get dms info and token
     data = request.data
+    token_type,access_token = request.headers.get('Authorization').split(' ')
+    print(token_type)
+    print(access_token)
     print(data)
-    """key = bytes([0,1,2,3,4,5,6,7,8,9,1,2,3,4,5,6])
-    cipher = AES.new(key, AES.MODE_ECB)
-    data = cipher.decrypt(data)"""
+    print(hashlib.sha256(b"222:173:190:239:254:237-dms").hexdigest())
+    if token_type == 'Bearer' and access_token == hashlib.sha256(b"222:173:190:239:254:237-dms").hexdigest():
+       print("take a break")
+   
+    #key = bytes([0,1,2,3,4,5,6,7,8,9,1,2,3,4,5,6])
+    #cipher = AES.new(key, AES.MODE_ECB)
+    #data = cipher.decrypt(data)
     data = unpad(data, AES.block_size)
-    #data = b64decode(data)
     data = json.loads(data)
     print(data)
-
-
+    
+    data['CPU1']=data.pop("C1")
+    data['CPU2']=data.pop("C2")
+    data['CPU3']=data.pop("C3")
+    data['CPU4']=data.pop("C4")
+    data['GPU']=data.pop("G")
+    data['cpu_freq']=data.pop("c_f")
+    data['loadavg']=data.pop("L")
+    data['AO_therm']=data.pop("AO_t")
+    data['CPU_therm']=data.pop("C_t")
+    data['GPU_therm']=data.pop("G_t")
+    data['PLL_therm']=data.pop("PLL_t")
+    data['thermal_fan_est']=data.pop("t_f_e")
+    data['disk']=data.pop("D")
+    data['mem']=data.pop("M")
+    data['fan']=data.pop("F")
+    data['time']=data.pop("T")
+    print(data)
     #socketio.emit('device_ip',device_total_ip)
     socketio.emit(ip_addr,data)
 
@@ -97,6 +121,16 @@ def upload():
 def wscontrol():
     return render_template('ws-control.html')
 
+@app.route("/preventive-maintenance")
+def pm():
+    return render_template('preventive-maintenance.html')
+
+@app.route("/log")
+def log():
+    return render_template('log.html')
+
+
+
 @app.route("/dmsip", methods=['GET','POST'])
 def dmsip():
     print(request.data)
@@ -106,11 +140,16 @@ def dmsip():
 
 @app.route("/jtop-nano")
 def jtop():
-    return render_template('web-analytics-real-time.html', async_mode= None)
+    return render_template('web-analytics-real-time.html', async_mode=socketio.async_mode)
 
 @app.route("/history-nano")
 def historyhtml():
     return render_template('history-nano.html')
+
+@app.route("/system-health")
+def sh():
+    return render_template('system-health.html')
+
 
 @app.route("/history-data", methods=['POST'])
 def historydata():
@@ -131,7 +170,7 @@ def historydata():
 @login_required
 def psutil():
     print(redis.lrange("device_ip", 0, redis.llen("device_ip")))
-    return render_template('psutil-real-time.html')
+    return render_template('psutil-real-time.html', async_mode=socketio.async_mode)
 
 @app.route("/deviceip")
 def deviceip():
