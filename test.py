@@ -17,7 +17,7 @@ import hashlib
 
 
 app = Flask(__name__,static_url_path="/templates", static_folder='/home/g/tmp/templates')
-redis = Redis(host='0.0.0.0',port=6379)
+redis = Redis(host='redis',port=6379)
 
 app.config['SECRET_KEY'] = 'secret!'
 #app.secret_key = config.get('flask', 'secret_key')
